@@ -1,0 +1,128 @@
+import javax.swing.*;
+import java.awt.*;
+import java.awt.event.*;
+import java.util.ArrayList;
+
+public class GradeCalculator extends JFrame {
+
+    private ArrayList<JTextField> gradeFields = new ArrayList<>();
+    private ArrayList<JTextField> creditFields = new ArrayList<>();
+    private JButton calculateButton;
+    private JLabel resultLabel;
+
+    public GradeCalculator() {
+        // Setting up the main frame
+        setTitle("Grade Calculator");
+        setSize(400, 300);
+        setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+        setLayout(new BorderLayout());
+
+        // Panel for input fields
+        JPanel inputPanel = new JPanel();
+        inputPanel.setLayout(new GridLayout(0, 3));
+
+        JLabel gradeLabel = new JLabel("Grade");
+        JLabel creditLabel = new JLabel("Credits");
+        inputPanel.add(gradeLabel);
+        inputPanel.add(creditLabel);
+        inputPanel.add(new JLabel("")); // Placeholder for buttons
+
+        // Add 5 input fields by default
+        for (int i = 0; i < 5; i++) {
+            addGradeAndCreditFields(inputPanel);
+        }
+
+        // Panel for the calculate button
+        JPanel buttonPanel = new JPanel();
+        calculateButton = new JButton("Calculate GPA");
+        calculateButton.addActionListener(new CalculateGPAListener());
+        buttonPanel.add(calculateButton);
+
+        // Panel for the result
+        resultLabel = new JLabel("Your GPA will appear here.");
+        resultLabel.setHorizontalAlignment(SwingConstants.CENTER);
+
+        // Add panels to the frame
+        add(inputPanel, BorderLayout.CENTER);
+        add(buttonPanel, BorderLayout.SOUTH);
+        add(resultLabel, BorderLayout.NORTH);
+
+        setVisible(true);
+    }
+
+    // Method to add grade and credit fields
+    private void addGradeAndCreditFields(JPanel panel) {
+        JTextField gradeField = new JTextField();
+        JTextField creditField = new JTextField();
+        gradeFields.add(gradeField);
+        creditFields.add(creditField);
+        panel.add(gradeField);
+        panel.add(creditField);
+        panel.add(new JLabel(""));
+    }
+
+    // Action listener to handle GPA calculation
+    private class CalculateGPAListener implements ActionListener {
+        @Override
+        public void actionPerformed(ActionEvent e) {
+            try {
+                double totalPoints = 0.0;
+                double totalCredits = 0.0;
+
+                for (int i = 0; i < gradeFields.size(); i++) {
+                    String gradeText = gradeFields.get(i).getText();
+                    String creditText = creditFields.get(i).getText();
+
+                    if (!gradeText.isEmpty() && !creditText.isEmpty()) {
+                        double grade = convertGradeToPoint(gradeText);
+                        double credits = Double.parseDouble(creditText);
+
+                        totalPoints += grade * credits;
+                        totalCredits += credits;
+                    }
+                }
+
+                if (totalCredits > 0) {
+                    double gpa = totalPoints / totalCredits;
+                    resultLabel.setText("Your GPA is: " + String.format("%.2f", gpa));
+                } else {
+                    resultLabel.setText("Please enter valid grades and credits.");
+                }
+            } catch (NumberFormatException ex) {
+                resultLabel.setText("Error: Please ensure all inputs are numbers.");
+            }
+        }
+    }
+
+    // Helper method to convert letter grades to GPA points
+    private double convertGradeToPoint(String grade) {
+        switch (grade.toUpperCase()) {
+            case "A":
+                return 4.0;
+            case "A-":
+                return 3.7;
+            case "B+":
+                return 3.3;
+            case "B":
+                return 3.0;
+            case "B-":
+                return 2.7;
+            case "C+":
+                return 2.3;
+            case "C":
+                return 2.0;
+            case "C-":
+                return 1.7;
+            case "D":
+                return 1.0;
+            case "F":
+                return 0.0;
+            default:
+                return 0.0;
+        }
+    }
+
+    public static void main(String[] args) {
+        SwingUtilities.invokeLater(() -> new GradeCalculator());
+    }
+}
